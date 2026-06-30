@@ -1,0 +1,85 @@
+<div class="dash">
+  <!-- KPI cards -->
+  <app-stat-cards />
+
+  <!-- cross-module shortcuts -->
+  <section class="modules">
+    @for (m of modules(); track m.label) {
+      <a class="mod app-card" [routerLink]="['/', m.link]" [style.--mc]="m.color">
+        <span class="mod-ic"><app-icon [name]="m.icon" /></span>
+        <span class="mod-meta">
+          <span class="mod-v">{{ m.value }}</span>
+          <span class="mod-l">{{ m.label }}</span>
+        </span>
+        <app-icon name="chevron-right" />
+      </a>
+    }
+  </section>
+
+  @if (em.error()) {
+    <div class="banner">
+      <app-icon name="alert" />
+      <span>Live connection issue — showing the last data received from Firebase.</span>
+    </div>
+  }
+
+  <!-- charts row 1 -->
+  <section class="grid charts-1">
+    <article class="app-card pad">
+      <header class="card-head">
+        <div>
+          <h3>Requests over time</h3>
+          <p class="muted">Last 14 days · peak {{ peakDay().count }} on {{ peakDay().label }}</p>
+        </div>
+        <span class="chip"><app-icon name="trend-up" /> Trend</span>
+      </header>
+      <app-area-chart [data]="timelinePoints()" color="var(--brand-red)" />
+    </article>
+
+    <article class="app-card pad">
+      <header class="card-head">
+        <h3>By status</h3>
+      </header>
+      <app-donut-chart
+        [segments]="statusSegments()"
+        [centerValue]="em.total()"
+        centerLabel="requests"
+      />
+    </article>
+  </section>
+
+  <!-- charts row 2 -->
+  <section class="grid charts-2">
+    <article class="app-card pad">
+      <header class="card-head">
+        <h3>Top cities</h3>
+        <span class="chip"><app-icon name="pin" /> Hotspots</span>
+      </header>
+      <app-bar-chart [data]="cityData()" color="var(--brand-teal)" [max]="6" />
+    </article>
+
+    <article class="app-card pad map-preview">
+      <header class="card-head">
+        <h3>Live map</h3>
+        <a class="link" [routerLink]="['/', 'map']">Full map <app-icon name="chevron-right" /></a>
+      </header>
+      <app-emergency-map [points]="em.filtered()" height="300px" (select)="open($event)" />
+    </article>
+  </section>
+
+  <!-- filters + recent requests -->
+  <app-filters-bar />
+
+  <section class="app-card recent">
+    <header class="card-head pad-head">
+      <div>
+        <h3>Recent requests</h3>
+        <p class="muted">{{ em.filtered().length }} matching · showing latest {{ recent().length }}</p>
+      </div>
+      <a class="link" [routerLink]="['/', 'emergency']">View all <app-icon name="chevron-right" /></a>
+    </header>
+    <app-requests-table [rows]="recent()" [sortable]="false" (select)="open($event)" />
+  </section>
+</div>
+
+<app-request-detail [request]="selected()" (close)="selectedKey.set(null)" />

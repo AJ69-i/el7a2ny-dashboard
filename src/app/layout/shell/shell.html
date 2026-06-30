@@ -1,0 +1,101 @@
+<div class="shell" [class.is-collapsed]="collapsed()" [class.is-mobile-open]="mobileOpen()">
+  <!-- ===================== Sidebar ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-logo-wrap">
+        <img [src]="logoSrc()" (error)="onLogoError()" alt="El7a2ny — Emergency, Tuning & Car Services" class="brand-logo" />
+      </span>
+    </div>
+
+    <nav class="nav" aria-label="Primary">
+      @for (g of navGroups; track $index) {
+        @if (g.title) {
+          <p class="nav-group">{{ g.title }}</p>
+        }
+        @for (item of g.items; track item.path) {
+          <a
+            class="nav-link"
+            [routerLink]="['/', item.path]"
+            routerLinkActive="active"
+            [attr.title]="item.label"
+          >
+            <app-icon [name]="item.icon" />
+            <span class="nav-label">{{ item.label }}</span>
+            @if (item.path === 'emergency' && em.activeCount() > 0) {
+              <span class="nav-count">{{ em.activeCount() }}</span>
+            }
+          </a>
+        }
+      }
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="live-card">
+        <span class="live-dot"></span>
+        <div>
+          <strong>{{ em.activeCount() }}</strong>
+          <span>active rescues</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <button class="backdrop" type="button" (click)="mobileOpen.set(false)" aria-label="Close menu"></button>
+
+  <!-- ===================== Main ===================== -->
+  <div class="main">
+    <header class="topbar">
+      <button class="icon-btn menu-btn" type="button" (click)="toggleSidebar()" aria-label="Toggle menu">
+        <app-icon name="menu" />
+      </button>
+
+      <div class="page-heading">
+        <h1>{{ currentTitle() }}</h1>
+        <p class="muted">Emergency, Tuning &amp; Car Services</p>
+      </div>
+
+      <div class="topbar-actions">
+        <button
+          class="icon-btn"
+          type="button"
+          (click)="searchOpen.set(true)"
+          aria-label="Search"
+          title="Search (⌘K / Ctrl+K)"
+        >
+          <app-icon name="search" />
+        </button>
+        <span class="live-pill">
+          <span class="live-dot"></span>
+          Live
+        </span>
+        <button class="icon-btn" type="button" (click)="toggleTheme()" aria-label="Toggle theme">
+          <app-icon [name]="dark() ? 'sun' : 'moon'" />
+        </button>
+        <app-alerts />
+        <div class="user-chip">
+          <span class="avatar">
+            @if (auth.avatar() && !avatarBroken()) {
+              <img [src]="auth.avatar()" (error)="onAvatarError()" alt="" />
+            } @else {
+              {{ initials(auth.displayName()) }}
+            }
+          </span>
+          <div class="user-meta">
+            <strong>{{ auth.displayName() }}</strong>
+            <span>{{ auth.role() }}</span>
+          </div>
+          <button class="logout" type="button" (click)="logout()" aria-label="Log out" title="Log out">
+            <app-icon name="log-out" />
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+
+<app-global-search [open]="searchOpen()" (close)="searchOpen.set(false)" />
+<app-toast />

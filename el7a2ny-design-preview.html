@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>El7a2ny · Redesign Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --orange:#f47c20;--orange-d:#d9610e;--orange-l:#fba64c;
+    --ink:#1f1f24;--ink-d:#0d0d10;
+    --st-new:#e5342b;--st-assigned:#8b5cf6;--st-en_route:#0ea5e9;--st-resolved:#10b981;--st-cancelled:#94a3b8;
+    --bg:#f3f4f7;--card:#fff;--muted:#f1f3f7;--border:#e4e7ee;
+    --t-strong:#15151a;--t:#3a3a42;--t-mut:#6b6f7a;
+    --r:16px;--shadow:0 2px 6px rgba(20,20,30,.07);--shadow-lg:0 18px 48px rgba(20,20,30,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--t);-webkit-font-smoothing:antialiased}
+  .app{display:grid;grid-template-columns:256px minmax(0,1fr);min-height:100vh}
+  /* sidebar */
+  .side{background:linear-gradient(180deg,var(--ink),var(--ink-d));color:#fff;padding:16px 12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto}
+  .brand{background:#fff;border-radius:14px;padding:10px 12px;margin:2px 4px 14px;box-shadow:var(--shadow)}
+  .brand img{display:block;width:100%;height:auto}
+  .brand .fallback{display:none;font-weight:800;font-size:1.3rem;color:var(--orange);text-align:center;letter-spacing:.02em}
+  .navgrp{font-size:.62rem;text-transform:uppercase;letter-spacing:.16em;color:rgba(255,255,255,.38);padding:14px 14px 6px;font-weight:700}
+  .nav a{display:flex;align-items:center;gap:12px;padding:9px 14px;border-radius:11px;color:rgba(255,255,255,.74);font-weight:600;font-size:.88rem;cursor:pointer}
+  .nav a:hover{background:rgba(255,255,255,.08);color:#fff}
+  .nav a.on{background:rgba(244,124,32,.16);color:#fff;box-shadow:inset 3px 0 0 var(--orange)}
+  .nav a svg{flex:0 0 auto}
+  .nav a .ct{margin-left:auto;background:var(--orange);font-size:.68rem;padding:1px 8px;border-radius:99px;color:#fff}
+  .logout{margin-top:auto;display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:11px;color:rgba(255,255,255,.7);font-weight:600;font-size:.88rem;cursor:pointer;border:1px solid rgba(255,255,255,.1)}
+  .logout:hover{background:rgba(229,52,43,.16);color:#fff}
+  /* main */
+  .main{min-width:0;display:flex;flex-direction:column}
+  .top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:14px;height:68px;padding:0 24px;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+  .top h1{font-size:1.2rem;color:var(--t-strong)}
+  .top p{font-size:.73rem;color:var(--t-mut)}
+  .acts{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .pill{display:inline-flex;align-items:center;gap:7px;font-size:.76rem;font-weight:700;color:var(--st-resolved);background:rgba(16,185,129,.12);padding:7px 12px;border-radius:99px}
+  .gdot{width:9px;height:9px;border-radius:50%;background:var(--st-resolved);box-shadow:0 0 0 4px rgba(16,185,129,.18)}
+  .ava{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#33333a,var(--ink));color:#fff;display:grid;place-items:center;font-weight:800;font-size:.76rem}
+  .wrap{padding:24px;flex:1}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow)}
+  .page{display:none;flex-direction:column;gap:20px}
+  .page.on{display:flex}
+  /* kpis */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px}
+  .kpi{padding:18px;position:relative;overflow:hidden}
+  .kpi::after{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--ac)}
+  .kpi .ic{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;color:var(--ac);background:color-mix(in srgb,var(--ac) 13%,transparent);margin-bottom:13px}
+  .kpi .v{font-size:2rem;font-weight:800;color:var(--t-strong);line-height:1}
+  .kpi .l{font-size:.84rem;color:var(--t-mut);margin-top:5px}
+  .kpi .bar{margin-top:12px;height:6px;border-radius:99px;background:var(--muted);overflow:hidden}
+  .kpi .bar i{display:block;height:100%;background:var(--ac)}
+  .row{display:grid;gap:20px}
+  .r1{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr)}
+  .r2{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)}
+  .pad{padding:20px}
+  .ch{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+  .ch h3{font-size:1.12rem;color:var(--t-strong)}
+  .ch p{font-size:.73rem;color:var(--t-mut);margin-top:2px}
+  .chip{font-size:.71rem;font-weight:700;color:var(--orange-d);background:rgba(244,124,32,.13);padding:5px 11px;border-radius:99px;text-decoration:none;cursor:pointer}
+  .donut{display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:center}
+  .ring{position:relative;width:158px;flex:0 0 auto}
+  .ring .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ring .c b{font-size:1.6rem;font-weight:800;color:var(--t-strong)}
+  .ring .c span{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--t-mut)}
+  .leg{list-style:none;display:grid;gap:8px;flex:1 1 120px;min-width:120px}
+  .leg li{display:flex;align-items:center;gap:9px;font-size:.84rem}
+  .leg .d{width:11px;height:11px;border-radius:4px}.leg .vv{margin-left:auto;font-weight:700;color:var(--t-strong)}
+  .bars{list-style:none;display:grid;gap:12px}
+  .bars li{display:grid;grid-template-columns:84px 1fr auto;align-items:center;gap:12px;font-size:.84rem}
+  .bars .lb{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bars .tk{height:12px;border-radius:99px;background:var(--muted);overflow:hidden}
+  .bars .fl{height:100%;border-radius:99px;background:var(--orange)}
+  .bars .vl{font-weight:700;color:var(--t-strong)}
+  .map{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:radial-gradient(circle at 30% 40%,rgba(244,124,32,.10),transparent 42%),radial-gradient(circle at 70% 60%,rgba(31,31,36,.06),transparent 42%),linear-gradient(#eef1f6,#e3e8ef)}
+  .map::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(31,31,36,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(31,31,36,.05) 1px,transparent 1px);background-size:34px 34px}
+  .pin{position:absolute;width:16px;height:16px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.3);transform:translate(-50%,-50%);cursor:pointer}
+  .pin.big{animation:pp 2s infinite}
+  @keyframes pp{0%{box-shadow:0 0 0 0 rgba(244,124,32,.5)}70%{box-shadow:0 0 0 12px rgba(244,124,32,0)}}
+  .mlegend{position:absolute;left:12px;bottom:12px;display:flex;gap:10px;flex-wrap:wrap;background:rgba(255,255,255,.88);backdrop-filter:blur(6px);border:1px solid var(--border);border-radius:12px;padding:8px 12px;font-size:.71rem;font-weight:600;z-index:2}
+  .mlegend i{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
+  /* filters */
+  .filters{padding:16px;display:flex;flex-direction:column;gap:14px}
+  .frow{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .search{flex:1 1 260px;display:flex;align-items:center;gap:10px;padding:0 14px;height:44px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--t-mut)}
+  .search input{flex:1;border:none;background:none;outline:none;font:inherit;color:var(--t-strong);min-width:0}
+  .seld{display:flex;align-items:center;gap:8px;height:44px;padding:0 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg)}
+  .seld span{font-size:.7rem;font-weight:700;color:var(--t-mut);text-transform:uppercase}
+  .seld select{border:none;background:none;outline:none;font:inherit;font-weight:600;color:var(--t-strong);cursor:pointer}
+  .pills{display:flex;gap:8px;flex-wrap:wrap}
+  .fp{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:99px;border:1px solid var(--border);background:#fff;color:var(--t);font-size:.84rem;font-weight:600;cursor:pointer}
+  .fp .pc{font-size:.71rem;font-weight:800;padding:1px 7px;border-radius:99px;background:color-mix(in srgb,var(--pcl) 16%,transparent);color:var(--pcl)}
+  .fp.on{background:var(--pcl);border-color:var(--pcl);color:#fff}
+  .fp.on .pc{background:rgba(255,255,255,.25);color:#fff}
+  .meta{display:flex;gap:14px;font-size:.84rem;color:var(--t-mut)}.meta b{color:var(--t-strong)}
+  /* table */
+  table{width:100%;border-collapse:collapse;font-size:.84rem}
+  th{text-align:left;padding:6px 18px 12px;font-size:.69rem;text-transform:uppercase;letter-spacing:.05em;color:var(--t-mut);font-weight:700}
+  td{padding:12px 18px;border-top:1px solid var(--border);vertical-align:middle}
+  tbody tr{cursor:pointer}
+  tbody tr:hover td{background:rgba(244,124,32,.05)}
+  .who{display:flex;align-items:center;gap:11px}
+  .who .a{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#33333a,var(--ink));color:#fff;display:grid;place-items:center;font-weight:800;font-size:.72rem;flex:0 0 auto}
+  .who b{color:var(--t-strong);display:block}.who span{font-size:.77rem;color:var(--t-mut)}
+  .stk b{color:var(--t-strong);font-weight:600}.stk span{font-size:.76rem;color:var(--t-mut);display:block}
+  .plate{font-family:ui-monospace,monospace;font-size:.73rem;background:var(--muted);padding:1px 6px;border-radius:6px;color:var(--t)}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:.71rem;font-weight:700;padding:4px 10px;border-radius:99px}
+  .badge .dt{width:7px;height:7px;border-radius:50%;background:currentColor}
+  .rowbtn{padding:6px 12px;border-radius:99px;border:1px solid var(--border);background:#fff;font-weight:700;font-size:.76rem;cursor:pointer;color:var(--orange-d);white-space:nowrap}
+  .rowbtn:hover{background:var(--orange);border-color:var(--orange);color:#fff}
+  .secthead{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 6px}
+  .secthead a{color:var(--orange-d);font-weight:700;font-size:.84rem;cursor:pointer}
+  /* offline days */
+  .od{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:20px}
+  .odtabs{display:flex;gap:8px;margin-bottom:14px}
+  .odtab{padding:8px 16px;border-radius:99px;border:1px solid var(--border);background:#fff;font-weight:700;font-size:.84rem;cursor:pointer}
+  .odtab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .field label{font-size:.78rem;font-weight:600;color:var(--t-mut)}
+  .field input{height:44px;border:1px solid var(--border);border-radius:12px;padding:0 14px;font:inherit;color:var(--t-strong);background:var(--bg)}
+  .btn{height:44px;border-radius:12px;background:var(--orange);color:#fff;font-weight:700;border:none;cursor:pointer;padding:0 18px}
+  .btn:hover{background:var(--orange-d)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .dchip{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:10px;background:rgba(244,124,32,.1);color:var(--orange-d);font-weight:600;font-size:.82rem;border:1px solid rgba(244,124,32,.2)}
+  .dchip button{border:none;background:none;color:var(--orange-d);cursor:pointer;font-size:1rem;line-height:1}
+  /* drawer */
+  .dr-back{position:fixed;inset:0;background:rgba(13,13,16,.5);backdrop-filter:blur(2px);z-index:40;display:none}
+  .dr-back.on{display:block}
+  .drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100vw);background:#fff;border-left:1px solid var(--border);box-shadow:var(--shadow-lg);z-index:50;transform:translateX(100%);transition:transform .26s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column}
+  .drawer.on{transform:translateX(0)}
+  .dh{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border)}
+  .dh .who b{font-size:1.05rem}
+  .xb{width:38px;height:38px;border-radius:11px;border:1px solid var(--border);background:#fff;display:grid;place-items:center;cursor:pointer;color:var(--t);font-size:1.1rem}
+  .db{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:18px}
+  .contact{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:12px;background:linear-gradient(135deg,#33333a,var(--ink));color:#fff}
+  .contact .ci{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.16)}
+  .contact .lbl{font-size:.7rem;color:rgba(255,255,255,.7);display:block}.contact b{font-size:1rem}
+  .contact .callb{margin-left:auto;font-weight:700;font-size:.82rem;background:var(--orange);padding:7px 14px;border-radius:99px}
+  .blk h4{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--t-mut);margin-bottom:10px}
+  .dl{display:grid;gap:9px}
+  .dl div{display:flex;justify-content:space-between;gap:16px;font-size:.84rem}
+  .dl dt{color:var(--t-mut)}.dl dd{color:var(--t-strong);font-weight:600;text-align:right}
+  .mono{font-family:ui-monospace,monospace;font-size:.8rem}
+  .minimap{height:140px;border-radius:12px;margin-top:10px}
+  .foot{padding:16px 20px;border-top:1px solid var(--border);background:var(--bg)}
+  .foot .fl2{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t-mut)}
+  .acts2{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .act{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:99px;border:1px solid var(--border);background:#fff;color:var(--acl);font-weight:700;font-size:.82rem;cursor:pointer}
+  .act.cur{background:var(--acl);border-color:var(--acl);color:#fff}
+  /* login overlay */
+  .login{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--orange-l),var(--orange) 55%,var(--orange-d))}
+  .login.on{display:flex}
+  .loginbox{background:#fff;border-radius:20px;padding:34px 30px;width:min(380px,92vw);box-shadow:var(--shadow-lg);text-align:center}
+  .loginbox img{width:160px;margin:0 auto 8px}
+  .loginbox h2{font-size:1.2rem;color:var(--t-strong);margin-bottom:4px}
+  .loginbox p{font-size:.82rem;color:var(--t-mut);margin-bottom:20px}
+  .loginbox .field{text-align:left}
+  .mappage{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;height:calc(100vh - 68px - 48px)}
+  .mappage .map{height:100%}
+  .side2{display:flex;flex-direction:column;overflow:hidden;padding:0}
+  .s2h{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
+  .s2h h3{font-size:1.05rem;color:var(--t-strong)}
+  .loc{list-style:none;padding:6px;overflow-y:auto;flex:1}
+  .loc li{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:12px;cursor:pointer}
+  .loc li:hover{background:rgba(244,124,32,.08)}
+  .loc .lp{width:12px;height:12px;border-radius:50%;flex:0 0 auto}
+  .loc .li{flex:1;min-width:0}.loc .li b{color:var(--t-strong);font-size:.84rem;display:block}.loc .li span{font-size:.74rem;color:var(--t-mut)}
+  /* responsive */
+  @media(max-width:1000px){.r1,.r2,.od{grid-template-columns:1fr}.mappage{grid-template-columns:1fr;height:auto}.mappage .map{height:54vh;min-height:320px}}
+  @media(max-width:860px){
+    .app{grid-template-columns:1fr}.side{display:none}
+    thead{display:none}
+    table,tbody,tr,td{display:block;width:100%}
+    tbody tr{border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden}
+    td{display:flex;justify-content:space-between;align-items:center;border:none;border-top:1px solid var(--border);padding:10px 14px}
+    td:first-child{border-top:none;background:var(--bg)}
+    td::before{content:attr(data-l);font-size:.69rem;font-weight:700;text-transform:uppercase;color:var(--t-mut)}
+    .stk{text-align:right}
+  }
+  @media(max-width:560px){.wrap{padding:14px}.top{padding:0 14px}.top p{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <img src="https://aj69-i.github.io/El7a2ny/assets/img/logo.webp" alt="El7a2ny" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+      <span class="fallback">EL7A2NY</span>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="logout" onclick="showLogin()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Log out</div>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <div><h1 id="ptitle">Dashboard</h1><p id="psub">Operations overview</p></div>
+      <div class="acts"><span class="pill"><span class="gdot"></span>Live</span><span class="ava">OP</span></div>
+    </header>
+    <div class="wrap" id="wrap"></div>
+  </div>
+</div>
+
+<div class="dr-back" id="drback" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer"></aside>
+
+<div class="login" id="login">
+  <div class="loginbox">
+    <img src="https://aj69-i.github.io/El7a2ny/assets/img/logo.webp" alt="El7a2ny" onerror="this.style.display='none'"/>
+    <h2>Operator sign in</h2>
+    <p>Emergency, Tuning &amp; Car Services</p>
+    <div class="field"><label>Email</label><input value="manager@el7a2ny.com"/></div>
+    <div class="field"><label>Password</label><input type="password" value="********"/></div>
+    <button class="btn" style="width:100%" onclick="hideLogin()">Sign in</button>
+    <p style="margin-top:14px;margin-bottom:0"><a class="secthead" style="color:var(--orange-d)" onclick="hideLogin()">Forgot password?</a></p>
+  </div>
+</div>
+
+<script>
+  var ST={new:{l:'New',c:'#e5342b'},assigned:{l:'Assigned',c:'#8b5cf6'},en_route:{l:'En route',c:'#0ea5e9'},resolved:{l:'Resolved',c:'#10b981'},cancelled:{l:'Cancelled',c:'#94a3b8'},online:{l:'Online',c:'#10b981'},offline:{l:'Offline',c:'#94a3b8'}};
+  function ini(n){return (n||'?').split(' ').slice(0,2).map(function(p){return p[0]}).join('').toUpperCase()}
+  function rgba(h,a){var n=parseInt(h.slice(1),16);return 'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+a+')'}
+  function badge(s){var d=ST[s]||{l:s,c:'#94a3b8'};return '<span class="badge" style="color:'+d.c+';background:'+rgba(d.c,.13)+'"><span class="dt"></span>'+d.l+'</span>'}
+
+  var EMERGENCY=[
+    {name:'Ahmed Hassan',phone:'+20 100 234 8821',carModel:'Toyota Corolla',carPlateNumber:'ل ط ر 4821',vin:'JT2BF22K1W0123456',cityName:'Cairo',area:'Nasr City',status:'en_route',coord:'30.0566, 31.3300',time:'4m ago'},
+    {name:'Mona Saleh',phone:'+20 122 887 1190',carModel:'Hyundai Elantra',carPlateNumber:'ق ص د 1390',vin:'KMHD84LF5JU654321',cityName:'Giza',area:'Dokki',status:'new',coord:'30.0388, 31.2110',time:'11m ago'},
+    {name:'Karim Adel',phone:'+20 106 552 7754',carModel:'Kia Sportage',carPlateNumber:'س ع ن 7754',vin:'KNDPB3AC8K7110022',cityName:'Alexandria',area:'Smouha',status:'assigned',coord:'31.2156, 29.9553',time:'23m ago'},
+    {name:'Sara Mahmoud',phone:'+20 111 200 2208',carModel:'Nissan Sunny',carPlateNumber:'ب ن ت 2208',vin:'MDHBN6AD9KG220088',cityName:'Cairo',area:'Maadi',status:'new',coord:'29.9602, 31.2569',time:'38m ago'},
+    {name:'Omar Fathy',phone:'+20 128 661 9012',carModel:'Chevrolet Optra',carPlateNumber:'ر م ز 6612',vin:'KL1JD56E5MK661200',cityName:'Mansoura',area:'El Gomhouria',status:'resolved',coord:'31.0409, 31.3785',time:'1h ago'},
+    {name:'Laila Tarek',phone:'+20 109 330 9930',carModel:'Renault Logan',carPlateNumber:'و د ع 9930',vin:'X7LLSRB1H63991020',cityName:'Giza',area:'6th October',status:'en_route',coord:'29.9285, 30.9188',time:'1h ago'},
+    {name:'Youssef Nabil',phone:'+20 102 774 5512',carModel:'Skoda Octavia',carPlateNumber:'ج ح ك 5512',vin:'TMBBA61Z3D2055120',cityName:'Alexandria',area:'Roushdy',status:'assigned',coord:'31.2333, 29.9650',time:'2h ago'}
+  ];
+  var MAINT=[
+    {name:'Hana Wael',phone:'+20 115 889 7741',carModel:'Fiat Tipo',carPlateNumber:'ل م ن 7741',cityName:'Cairo',area:'Heliopolis',date:'2026-06-26',problem:'Engine overheating',requestType:'Workshop',status:'new',time:'9m ago'},
+    {name:'Tarek Sami',phone:'+20 100 552 1180',carModel:'Toyota Hilux',carPlateNumber:'ع ف ق 1180',cityName:'Mansoura',area:'Toril',date:'2026-06-27',problem:'Brake pads replacement',requestType:'Home',status:'assigned',time:'34m ago'},
+    {name:'Dina Fouad',phone:'+20 120 447 3398',carModel:'MG 5',carPlateNumber:'ط ك ل 3398',cityName:'Giza',area:'Haram',date:'2026-06-28',problem:'AC not cooling',requestType:'Workshop',status:'new',time:'1h ago'},
+    {name:'Sherif Gamal',phone:'+20 127 880 2245',carModel:'Jeep Cherokee',carPlateNumber:'ر ص و 2245',cityName:'Cairo',area:'New Cairo',date:'2026-06-29',problem:'Oil change + filter',requestType:'Home',status:'resolved',time:'3h ago'}
+  ];
+  var AMEND=[
+    {name:'Nour Adham',phone:'+20 127 004 6620',carModel:'MG ZS',carPlateNumber:'ص ط ع 6620',cityName:'Giza',budge:'12,000 EGP',describition:'Tinted windows + alloy rims upgrade',status:'new',time:'20m ago'},
+    {name:'Bassel Hany',phone:'+20 101 220 7788',carModel:'BMW 320i',carPlateNumber:'و ق ز 7788',cityName:'Cairo',budge:'45,000 EGP',describition:'Full body wrap (matte black)',status:'assigned',time:'2h ago'},
+    {name:'Maged Roshdy',phone:'+20 109 556 3312',carModel:'Audi A4',carPlateNumber:'ح ل ب 3312',cityName:'Alexandria',budge:'30,000 EGP',describition:'Sport exhaust + ECU tuning',status:'resolved',time:'5h ago'}
+  ];
+  var CUST=[
+    {name:'Ahmed Hassan',phone:'+20 100 234 8821',carModel:'Toyota Corolla',carPlateNumber:'ل ط ر 4821',vin:'JT2BF22K1W0123456',cityName:'Cairo',area:'Nasr City',status:'online'},
+    {name:'Mona Saleh',phone:'+20 122 887 1190',carModel:'Hyundai Elantra',carPlateNumber:'ق ص د 1390',vin:'KMHD84LF5JU654321',cityName:'Giza',area:'Dokki',status:'offline'},
+    {name:'Karim Adel',phone:'+20 106 552 7754',carModel:'Kia Sportage',carPlateNumber:'س ع ن 7754',vin:'KNDPB3AC8K7110022',cityName:'Alexandria',area:'Smouha',status:'online'},
+    {name:'Dina Fouad',phone:'+20 120 447 3398',carModel:'MG 5',carPlateNumber:'ط ك ل 3398',vin:'LSGGD52H1MA662000',cityName:'Giza',area:'Haram',status:'offline'},
+    {name:'Bassel Hany',phone:'+20 101 220 7788',carModel:'BMW 320i',carPlateNumber:'و ق ز 7788',vin:'WBA8E1G50JNU12345',cityName:'Cairo',area:'New Cairo',status:'online'}
+  ];
+  var VIP=[CUST[0],CUST[2],CUST[4]];
+
+  var COLS={
+    who:{l:'Requester',r:function(o){return '<div class="who"><span class="a">'+ini(o.name)+'</span><div><b>'+o.name+'</b><span>'+o.phone+'</span></div></div>'}},
+    veh:{l:'Vehicle',r:function(o){return '<div class="stk"><b>'+o.carModel+'</b><span class="plate">'+o.carPlateNumber+'</span></div>'}},
+    loc:{l:'Location',r:function(o){return '<div class="stk"><b>'+o.cityName+'</b><span>'+(o.area||'—')+'</span></div>'}},
+    status:{l:'Status',r:function(o){return badge(o.status)}},
+    time:{l:'Reported',r:function(o){return '<span class="stk"><b>'+o.time+'</b></span>'}},
+    booking:{l:'Booking',r:function(o){return '<div class="stk"><b>'+o.date+'</b><span>'+o.requestType+'</span></div>'}},
+    problem:{l:'Problem',r:function(o){return o.problem}},
+    budge:{l:'Budget',r:function(o){return '<b style="color:var(--t-strong)">'+o.budge+'</b>'}},
+    describition:{l:'Description',r:function(o){return o.describition}}
+  };
+
+  var SECTIONS={
+    dashboard:{title:'Dashboard',sub:'Operations overview',type:'dashboard'},
+    emergency:{title:'Emergency requests',sub:'Live roadside SOS · map + dispatch',type:'table',rows:EMERGENCY,cols:['who','veh','loc','status','time'],action:'Done',status:true,map:true},
+    maintenance:{title:'Maintenance bookings',sub:'Home & workshop service requests',type:'table',rows:MAINT,cols:['who','veh','booking','problem','status'],action:'Done',status:true},
+    amendments:{title:'Amendment requests',sub:'Tuning & modification requests',type:'table',rows:AMEND,cols:['who','veh','budge','describition','status'],action:'Done',status:true},
+    customers:{title:'Customers',sub:'All registered customers',type:'table',rows:CUST,cols:['who','veh','loc','status'],action:'★ VIP'},
+    vip:{title:'VIP customers',sub:'Priority customers',type:'table',rows:VIP,cols:['who','veh','loc','status'],action:'Remove'},
+    offline:{title:'Offline days',sub:'Block out unavailable days',type:'offline'},
+    'emergency-history':{title:'Emergency history',sub:'Archived / resolved SOS',type:'table',rows:EMERGENCY.map(function(o){return Object.assign({},o,{status:'resolved'})}),cols:['who','veh','loc','status','time'],action:'Restore'},
+    'users-history':{title:'Users history',sub:'Deleted customer records',type:'table',rows:CUST.map(function(o){return Object.assign({},o,{status:'offline'})}),cols:['who','veh','loc','status'],action:'Restore'},
+    map:{title:'Live map',sub:'Emergencies by location',type:'map'}
+  };
+
+  var NAV=[
+    {p:'dashboard',l:'Dashboard',icon:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>'},
+    {grp:'Operations'},
+    {p:'emergency',l:'Emergency',ct:'7',icon:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'},
+    {p:'maintenance',l:'Maintenance',ct:'4',icon:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.1 2.1-2.1-.6-.6-2.1z"/>'},
+    {p:'amendments',l:'Amendments',ct:'3',icon:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>'},
+    {grp:'Customers'},
+    {p:'customers',l:'Customers',icon:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>'},
+    {p:'vip',l:'VIP customers',icon:'<polygon points="12 2 15 9 22 9 16 14 18 21 12 17 6 21 8 14 2 9 9 9"/>'},
+    {grp:'Scheduling'},
+    {p:'offline',l:'Offline days',icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'},
+    {grp:'History'},
+    {p:'emergency-history',l:'Emergency history',icon:'<path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/>'},
+    {p:'users-history',l:'Users history',icon:'<path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/>'},
+    {p:'map',l:'Live map',icon:'<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>'}
+  ];
+
+  function svg(p){return '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'}
+  function buildNav(){
+    document.getElementById('nav').innerHTML=NAV.map(function(n){
+      if(n.grp)return '<div class="navgrp">'+n.grp+'</div>';
+      return '<a data-p="'+n.p+'" onclick="go(\''+n.p+'\')">'+svg(n.icon)+' '+n.l+(n.ct?'<span class="ct">'+n.ct+'</span>':'')+'</a>';
+    }).join('');
+  }
+
+  var cur='dashboard', curStatus='all', curQuery='';
+  function go(p){
+    cur=p;curStatus='all';curQuery='';
+    var s=SECTIONS[p];
+    document.getElementById('ptitle').textContent=s.title;
+    document.getElementById('psub').textContent=s.sub;
+    document.querySelectorAll('.nav a').forEach(function(a){a.classList.toggle('on',a.dataset.p===p)});
+    var w=document.getElementById('wrap');
+    if(s.type==='dashboard')w.innerHTML=dashHtml();
+    else if(s.type==='map')w.innerHTML=mapHtml();
+    else if(s.type==='offline')w.innerHTML=offlineHtml();
+    else w.innerHTML=tableHtml(s);
+    if(s.type==='table')renderRows();
+    window.scrollTo(0,0);
+  }
+
+  function tableHtml(s){
+    var pills='';
+    if(s.status){
+      var counts={}; s.rows.forEach(function(r){counts[r.status]=(counts[r.status]||0)+1});
+      var keys=['all'].concat(Object.keys(counts));
+      pills='<div class="pills">'+keys.map(function(k){
+        var c=k==='all'?'var(--ink)':(ST[k]?ST[k].c:'#94a3b8');var n=k==='all'?s.rows.length:counts[k];
+        return '<button class="fp'+(k==='all'?' on':'')+'" style="--pcl:'+c+'" data-s="'+k+'" onclick="setStatus(\''+k+'\',this)">'+(k==='all'?'All':(ST[k]?ST[k].l:k))+'<span class="pc">'+n+'</span></button>';
+      }).join('')+'</div>';
+    }
+    return '<section class="page on">'+
+      '<div class="card filters"><div class="frow">'+
+        '<label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search…" oninput="onSearch(this.value)"/></label>'+
+        '<div class="seld"><span>Sort</span><select><option>Newest</option><option>Name</option><option>City</option></select></div>'+
+      '</div>'+pills+'</div>'+
+      '<div class="meta"><span><b id="cnt">'+s.rows.length+'</b> records</span></div>'+
+      '<div class="card" style="padding:8px 4px"><table><thead><tr>'+
+        s.cols.map(function(c){return '<th>'+COLS[c].l+'</th>'}).join('')+'<th></th></tr></thead>'+
+        '<tbody id="tb"></tbody></table></div></section>';
+  }
+  function renderRows(){
+    var s=SECTIONS[cur];if(!s||s.type!=='table')return;
+    var rows=s.rows.filter(function(r){
+      if(s.status&&curStatus!=='all'&&r.status!==curStatus)return false;
+      if(curQuery){var hay=Object.values(r).join(' ').toLowerCase();if(hay.indexOf(curQuery)<0)return false}
+      return true;
+    });
+    document.getElementById('tb').innerHTML=rows.map(function(r,i){
+      var idx=s.rows.indexOf(r);
+      return '<tr onclick="openDrawer('+idx+')">'+s.cols.map(function(c){return '<td data-l="'+COLS[c].l+'">'+COLS[c].r(r)+'</td>'}).join('')+
+        '<td data-l="" style="text-align:right"><button class="rowbtn" onclick="event.stopPropagation()">'+s.action+'</button></td></tr>';
+    }).join('')||'<tr><td style="padding:36px;text-align:center;color:var(--t-mut)">No records match.</td></tr>';
+    var c=document.getElementById('cnt');if(c)c.textContent=rows.length;
+  }
+  function onSearch(v){curQuery=(v||'').toLowerCase();renderRows()}
+  function setStatus(s,el){curStatus=s;document.querySelectorAll('#wrap .fp').forEach(function(b){b.classList.remove('on')});el.classList.add('on');renderRows()}
+
+  function openDrawer(idx){
+    var s=SECTIONS[cur];var r=s.rows[idx];if(!r)return;
+    var rowsHtml='';
+    var fields=[['carModel','Model'],['carPlateNumber','Plate'],['vin','VIN'],['cityName','City'],['area','Area'],['date','Date'],['requestType','Service type'],['problem','Problem'],['budge','Budget'],['describition','Description'],['coord','Coords']];
+    var veh=fields.filter(function(f){return r[f[0]]!==undefined}).map(function(f){var mono=(f[0]==='carPlateNumber'||f[0]==='vin'||f[0]==='coord')?' class="mono"':'';return '<div><dt>'+f[1]+'</dt><dd'+mono+'>'+r[f[0]]+'</dd></div>'}).join('');
+    var statusBtns=r.status&&ST[r.status]&&['new','assigned','en_route','resolved'].indexOf(r.status)>-1?
+      '<div class="foot"><span class="fl2">Update status</span><div class="acts2">'+['new','assigned','en_route','resolved','cancelled'].map(function(st){var cur=st===r.status;return '<button class="act'+(cur?' cur':'')+'" style="--acl:'+ST[st].c+'">'+(cur?'✓ ':'')+ST[st].l+'</button>'}).join('')+'</div></div>':'';
+    document.getElementById('drawer').innerHTML=
+      '<div class="dh"><div class="who"><span class="a">'+ini(r.name)+'</span><div><b>'+r.name+'</b>'+(r.status?badge(r.status):'')+'</div></div><button class="xb" onclick="closeDrawer()">×</button></div>'+
+      '<div class="db">'+
+        '<div class="contact"><span class="ci"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><div><span class="lbl">Phone</span><b>'+r.phone+'</b></div><span class="callb">Call</span></div>'+
+        '<div class="blk"><h4>Details</h4><dl class="dl">'+veh+'</dl>'+(r.coord?'<div class="map minimap"><span class="pin big" style="left:50%;top:50%;background:var(--orange)"></span></div>':'')+'</div>'+
+      '</div>'+statusBtns;
+    document.getElementById('drback').classList.add('on');
+    document.getElementById('drawer').classList.add('on');
+  }
+  function closeDrawer(){document.getElementById('drback').classList.remove('on');document.getElementById('drawer').classList.remove('on')}
+
+  function mapHtml(){
+    var pins=EMERGENCY.map(function(r,i){var x=22+(i*11)%64,y=28+(i*17)%52;return '<span class="pin'+(r.status==='new'?' big':'')+'" style="left:'+x+'%;top:'+y+'%;background:'+ST[r.status].c+'" onclick="go(\'emergency\')"></span>'}).join('');
+    var list=EMERGENCY.map(function(r,i){return '<li onclick="go(\'emergency\')"><span class="lp" style="background:'+ST[r.status].c+'"></span><div class="li"><b>'+r.name+'</b><span>'+r.cityName+' · '+r.area+'</span></div>'+badge(r.status)+'</li>'}).join('');
+    return '<section class="page on"><div class="mappage"><div class="card map" style="padding:0">'+pins+
+      '<div class="mlegend"><span><i style="background:var(--st-new)"></i>New</span><span><i style="background:var(--st-assigned)"></i>Assigned</span><span><i style="background:var(--st-en_route)"></i>En route</span><span><i style="background:var(--st-resolved)"></i>Resolved</span></div></div>'+
+      '<aside class="card side2"><div class="s2h"><h3>Locations</h3><span class="chip">'+EMERGENCY.length+'</span></div><ul class="loc">'+list+'</ul></aside></div></section>';
+  }
+
+  var odTab='Home', odDates={Home:['Jun 26, 2026','Jun 27, 2026','Jul 03, 2026'],Workshop:['Jun 30, 2026','Jul 05, 2026']};
+  function offlineHtml(){
+    return '<section class="page on"><div class="od">'+
+      '<div class="card pad"><div class="odtabs"><button class="odtab'+(odTab==='Home'?' on':'')+'" onclick="odSet(\'Home\')">Home service</button><button class="odtab'+(odTab==='Workshop'?' on':'')+'" onclick="odSet(\'Workshop\')">Workshop</button></div>'+
+        '<div class="field"><label>Add a single day</label><input type="date" id="odd"/></div>'+
+        '<button class="btn" style="width:100%" onclick="odAdd()">+ Block this day</button>'+
+        '<p style="font-size:.78rem;color:var(--t-mut);margin-top:12px">Blocked days are written to <b>Busydates</b> with type <b>'+odTab+'</b> — exactly like the original app.</p></div>'+
+      '<div class="card pad"><div class="ch"><h3>'+odTab+' — blocked days</h3><span class="chip">'+odDates[odTab].length+' days</span></div><div class="chips" id="odchips">'+odChips()+'</div></div>'+
+      '</div></section>';
+  }
+  function odChips(){return odDates[odTab].map(function(d,i){return '<span class="dchip">'+d+' <button onclick="odDel('+i+')">×</button></span>'}).join('')||'<span style="color:var(--t-mut);font-size:.84rem">No blocked days.</span>'}
+  function odSet(t){odTab=t;go('offline')}
+  function odAdd(){var v=document.getElementById('odd').value;if(v){var d=new Date(v);odDates[odTab].push(d.toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'}))}document.getElementById('odchips').innerHTML=odChips();var h=document.querySelector('#wrap .chip');if(h)h.textContent=odDates[odTab].length+' days'}
+  function odDel(i){odDates[odTab].splice(i,1);document.getElementById('odchips').innerHTML=odChips();var h=document.querySelector('#wrap .chip');if(h)h.textContent=odDates[odTab].length+' days'}
+
+  function dashHtml(){
+    return '<section class="page on">'+
+      '<div class="kpis">'+
+        kpi('var(--ink)','231','Total requests','<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>')+
+        kpi('var(--orange)','17','Active rescues','<rect x="1" y="4" width="14" height="11" rx="1.5"/><path d="M15 8h4l3 3v4h-7z"/><circle cx="5.5" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>')+
+        kpi('var(--st-new)','9','New / unassigned','<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>')+
+        kpi('var(--st-resolved)','196','Resolved','<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>')+
+        kpiBar('var(--orange-d)','85%','Resolution rate','<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',85)+
+      '</div>'+
+      '<div class="row r1"><div class="card pad"><div class="ch"><div><h3>Requests over time</h3><p>Last 14 days · peak 24 on Jun 21</p></div><span class="chip">Trend</span></div>'+
+        '<svg viewBox="0 0 300 100" preserveAspectRatio="none" style="width:100%;height:150px"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f47c20" stop-opacity=".32"/><stop offset="1" stop-color="#f47c20" stop-opacity="0"/></linearGradient></defs>'+
+        '<line x1="0" y1="92" x2="300" y2="92" stroke="#e4e7ee" vector-effect="non-scaling-stroke"/>'+
+        '<path d="M0 92 L0 65 L23 52 L46 62 L69 45 L92 55 L115 32 L138 19 L161 39 L184 49 L207 29 L230 12 L253 35 L277 22 L300 42 L300 92 Z" fill="url(#g)"/>'+
+        '<path d="M0 65 L23 52 L46 62 L69 45 L92 55 L115 32 L138 19 L161 39 L184 49 L207 29 L230 12 L253 35 L277 22 L300 42" fill="none" stroke="#f47c20" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>'+
+        '<div style="display:flex;justify-content:space-between;margin-top:8px;font-size:.72rem;color:var(--t-mut)"><span>Jun 9</span><span>Jun 14</span><span>Jun 18</span><span>Jun 22</span></div></div>'+
+      '<div class="card pad"><div class="ch"><h3>By status</h3></div><div class="donut"><div class="ring"><svg viewBox="0 0 120 120" style="width:100%">'+
+        '<circle cx="60" cy="60" r="42" fill="none" stroke="#f1f3f7" stroke-width="14"/>'+
+        '<circle cx="60" cy="60" r="42" fill="none" stroke="var(--st-resolved)" stroke-width="14" stroke-dasharray="223.9 263.9" transform="rotate(-90 60 60)"/>'+
+        '<circle cx="60" cy="60" r="42" fill="none" stroke="var(--st-cancelled)" stroke-width="14" stroke-dasharray="20.6 263.9" transform="rotate(215.5 60 60)"/>'+
+        '<circle cx="60" cy="60" r="42" fill="none" stroke="var(--st-new)" stroke-width="14" stroke-dasharray="10.3 263.9" transform="rotate(243.5 60 60)"/>'+
+        '<circle cx="60" cy="60" r="42" fill="none" stroke="var(--st-assigned)" stroke-width="14" stroke-dasharray="5.7 263.9" transform="rotate(257.5 60 60)"/>'+
+        '<circle cx="60" cy="60" r="42" fill="none" stroke="var(--st-en_route)" stroke-width="14" stroke-dasharray="3.4 263.9" transform="rotate(265.3 60 60)"/></svg><div class="c"><b>231</b><span>requests</span></div></div>'+
+        '<ul class="leg"><li><span class="d" style="background:var(--st-new)"></span>New<span class="vv">9</span></li><li><span class="d" style="background:var(--st-assigned)"></span>Assigned<span class="vv">5</span></li><li><span class="d" style="background:var(--st-en_route)"></span>En route<span class="vv">3</span></li><li><span class="d" style="background:var(--st-resolved)"></span>Resolved<span class="vv">196</span></li><li><span class="d" style="background:var(--st-cancelled)"></span>Cancelled<span class="vv">18</span></li></ul></div></div></div>'+
+      '<div class="row r2"><div class="card pad"><div class="ch"><h3>Top cities</h3><span class="chip">Hotspots</span></div><ul class="bars">'+
+        bar('Cairo',100,64)+bar('Giza',64,41)+bar('Alexandria',52,33)+bar('Mansoura',34,22)+bar('Tanta',23,15)+'</ul></div>'+
+      '<div class="card pad"><div class="ch"><h3>Live map</h3><a class="chip" onclick="go(\'map\')">Full map ›</a></div><div class="map" style="height:280px">'+
+        EMERGENCY.slice(0,6).map(function(r,i){var x=24+(i*12)%60,y=30+(i*19)%48;return '<span class="pin'+(r.status==='new'?' big':'')+'" style="left:'+x+'%;top:'+y+'%;background:'+ST[r.status].c+'"></span>'}).join('')+
+        '<div class="mlegend"><span><i style="background:var(--st-new)"></i>New</span><span><i style="background:var(--st-en_route)"></i>En route</span><span><i style="background:var(--st-resolved)"></i>Resolved</span></div></div></div></div>'+
+      '</section>';
+  }
+  function kpi(ac,v,l,ic){return '<div class="card kpi" style="--ac:'+ac+'"><div class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+ic+'</svg></div><div class="v">'+v+'</div><div class="l">'+l+'</div></div>'}
+  function kpiBar(ac,v,l,ic,p){return '<div class="card kpi" style="--ac:'+ac+'"><div class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+ic+'</svg></div><div class="v">'+v+'</div><div class="l">'+l+'</div><div class="bar"><i style="width:'+p+'%"></i></div></div>'}
+  function bar(l,w,v){return '<li><span class="lb">'+l+'</span><span class="tk"><span class="fl" style="width:'+w+'%"></span></span><span class="vl">'+v+'</span></li>'}
+
+  function showLogin(){document.getElementById('login').classList.add('on')}
+  function hideLogin(){document.getElementById('login').classList.remove('on')}
+
+  buildNav();
+  go('dashboard');
+</script>
+</body>
+</html>

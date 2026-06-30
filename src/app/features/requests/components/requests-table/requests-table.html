@@ -1,0 +1,85 @@
+@if (rows().length === 0) {
+  <div class="empty">
+    <app-icon name="check-circle" />
+    <p>No requests match your filters.</p>
+  </div>
+} @else {
+  <div class="table-wrap">
+    <table class="rq-table">
+      <thead>
+        <tr>
+          <th>
+            <button type="button" class="th-btn" (click)="onSort('name')">
+              Requester
+              @if (sortIcon('name')) {<app-icon [name]="sortIcon('name')" />}
+            </button>
+          </th>
+          <th>
+            <button type="button" class="th-btn" (click)="onSort('carModel')">
+              Vehicle
+              @if (sortIcon('carModel')) {<app-icon [name]="sortIcon('carModel')" />}
+            </button>
+          </th>
+          <th>
+            <button type="button" class="th-btn" (click)="onSort('city')">
+              Location
+              @if (sortIcon('city')) {<app-icon [name]="sortIcon('city')" />}
+            </button>
+          </th>
+          <th>
+            <button type="button" class="th-btn" (click)="onSort('status')">
+              Status
+              @if (sortIcon('status')) {<app-icon [name]="sortIcon('status')" />}
+            </button>
+          </th>
+          <th>
+            <button type="button" class="th-btn" (click)="onSort('createdAt')">
+              Reported
+              @if (sortIcon('createdAt')) {<app-icon [name]="sortIcon('createdAt')" />}
+            </button>
+          </th>
+          <th aria-label="Actions"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of rows(); track trackKey($index, r)) {
+          <tr (click)="select.emit(r)" tabindex="0" (keydown.enter)="select.emit(r)">
+            <td data-label="Requester">
+              <div class="requester">
+                <span class="avatar">{{ initials(r.name) }}</span>
+                <div class="who">
+                  <strong>{{ r.name }}</strong>
+                  <span class="muted">{{ r.telephone }}</span>
+                </div>
+              </div>
+            </td>
+            <td data-label="Vehicle">
+              <div class="cell-stack">
+                <span>{{ r.carModel }}</span>
+                <span class="plate">{{ r.carPlateNumber }}</span>
+              </div>
+            </td>
+            <td data-label="Location">
+              <div class="cell-stack">
+                <span>{{ r.city }}</span>
+                <span class="muted">{{ r.area }}</span>
+              </div>
+            </td>
+            <td data-label="Status">
+              <app-status-badge [status]="r.status" />
+            </td>
+            <td data-label="Reported">
+              <div class="cell-stack">
+                <span>{{ timeAgo(r.createdAt) }}</span>
+                <span class="muted">{{ formatDateTime(r.createdAt) }}</span>
+              </div>
+            </td>
+            <td class="action-cell" data-label="">
+              <span class="go"><app-icon name="chevron-right" /></span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

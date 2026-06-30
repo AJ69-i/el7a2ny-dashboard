@@ -1,59 +1,60 @@
-# El7a2nyDashboard
+# El7a2ny — Rescue Operations Dashboard
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.12.
+[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
 
-## Development server
+> Replace `OWNER/REPO` above with your GitHub path (e.g. `aj69-i/el7a2ny-dashboard`) so the
+> badge resolves.
 
-To start a local development server, run:
+Operator console for **El7a2ny — Emergency, Tuning & Car Services**: a roadside‑rescue dispatch
+and customer‑management dashboard built on **Angular 21** (standalone components, signals,
+zoneless) over **Firebase Realtime Database**.
 
-```bash
-ng serve
-```
+## Features
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **Emergency dispatch** — live requests table, interactive map (Leaflet + OpenStreetMap, keyless),
+  detail drawer with status write‑back.
+- **Operations** — maintenance bookings, amendment (tuning) requests — each a filterable,
+  paginated, exportable list.
+- **Customers & VIP** — customer directory, VIP management, and a **Customer 360** profile that
+  joins every request across modules by user ID.
+- **Histories** — emergency / maintenance / amendment / users archives with restore.
+- **Offline days** — block Home/Workshop days (single or range).
+- **Analytics** — cross‑module KPIs and clickable charts that drill into filtered lists.
+- **Global search** (⌘K), **CSV export**, **new‑request browser notifications**, light/dark theme.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+## Quick start
 
 ```bash
-ng build
+npm install --legacy-peer-deps   # @angular/fire peer-dep; handled by .npmrc
+npm start                        # dev server → http://localhost:4200
+npm run build                    # production build → dist/el7a2ny-dashboard/browser
+npm test                         # unit tests (watch)   ·   npm run test:ci  (headless)
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+**Sign‑in:** login is currently bypassed (`AUTH_BYPASS` in `src/app/core/auth-config.ts`) so the
+app opens directly. To require sign‑in, set it to `false` — operator accounts are in the same file.
 
-## Running unit tests
+## Deployment
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Static SPA on **Firebase Hosting** (config in `firebase.json`):
 
 ```bash
-ng test
+npm run build
+firebase deploy --only hosting
 ```
 
-## Running end-to-end tests
+CI (GitHub Actions, `.github/workflows/ci.yml`) builds + tests every push/PR and
+**auto‑deploys to Hosting on pushes to `main`** — once the `FIREBASE_SERVICE_ACCOUNT` repo
+secret is set (see the comment in the workflow).
 
-For end-to-end (e2e) testing, run:
+## Documentation
 
-```bash
-ng e2e
-```
+| Doc | What's in it |
+|---|---|
+| `MIGRATION_PLAN.md` | Architecture, the original→Angular 21 rebuild, Firebase data model |
+| `SECURITY.md` | Auth, database rules, App Check, password cleanup — pre‑production steps |
+| `AUDIT.md` | Security / UI‑state / error‑handling / deployment review + go‑live checklist |
+| `TESTING.md` | Test setup, patterns, and good next tests to add |
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+> ⚠️ **Before going public**, complete the owner‑side items in `AUDIT.md` / `SECURITY.md` —
+> most importantly, **lock the Realtime Database rules** and enable real authentication.

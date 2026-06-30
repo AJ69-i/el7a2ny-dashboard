@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: Build & test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+        # Once you commit a package-lock.json, switch to `npm ci` and add
+        # `cache: npm` to the setup-node step for faster, reproducible installs.
+
+      - name: Build (production)
+        run: npm run build
+
+      - name: Unit tests (headless Chrome)
+        run: npm run test:ci
+        # ubuntu-latest ships Google Chrome, which karma-chrome-launcher auto-detects.
+        # If a Chrome sandbox error appears, add a ChromeHeadlessNoSandbox launcher
+        # in a karma.conf.js and use: npm run test:ci -- --browsers=ChromeHeadlessNoSandbox
+
+  deploy:
+    name: Deploy to Firebase Hosting (live)
+    needs: build-and-test
+    # Only on a direct push to the default branch (never PRs / forks).
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    env:
+      # Empty until you add the secret -> the deploy step is skipped (job stays green).
+      FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Build (production)
+        run: npm run build
+
+      - name: Deploy to Firebase Hosting
+        if: ${{ env.FIREBASE_SA != '' }}
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: el7a2ny-b70c7
+          channelId: live
+        # SETUP (one-time, needs Firebase owner access):
+        #  1. Firebase console -> Project settings -> Service accounts -> Generate new private key
+        #  2. GitHub repo -> Settings -> Secrets and variables -> Actions -> New repository secret
+        #     Name: FIREBASE_SERVICE_ACCOUNT   Value: <the full service-account JSON>
+        # Deploys Hosting only (database rules are deployed separately by the owner).

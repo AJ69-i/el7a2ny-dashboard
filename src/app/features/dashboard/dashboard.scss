@@ -1,0 +1,176 @@
+:host {
+  display: block;
+}
+
+.dash {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.grid {
+  display: grid;
+  gap: var(--gap);
+}
+
+.charts-1 {
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+}
+
+.charts-2 {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+}
+
+.pad {
+  padding: 20px;
+}
+
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.card-head h3 {
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.card-head .muted {
+  font-size: var(--fs-xs);
+  margin-top: 2px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--brand-teal);
+  background: color-mix(in srgb, var(--brand-teal) 12%, transparent);
+  padding: 5px 11px;
+  border-radius: var(--r-full);
+  white-space: nowrap;
+}
+
+.chip app-icon {
+  font-size: 14px;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--brand-red);
+  white-space: nowrap;
+}
+
+.link app-icon {
+  font-size: 15px;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.map-preview {
+  padding: 20px;
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--c-warning) 12%, transparent);
+  color: color-mix(in srgb, var(--c-warning) 80%, var(--text-strong));
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+
+.banner app-icon {
+  font-size: 18px;
+  flex: 0 0 auto;
+}
+
+.recent {
+  padding: 8px 4px;
+}
+
+.pad-head {
+  padding: 14px 18px 8px;
+  margin-bottom: 4px;
+}
+
+.modules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--gap);
+}
+
+.mod {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 15px 16px;
+  transition: transform var(--t-fast), box-shadow var(--t-fast);
+}
+
+.mod:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.mod-ic {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 19px;
+  color: var(--mc);
+  background: color-mix(in srgb, var(--mc) 13%, transparent);
+  flex: 0 0 auto;
+}
+
+.mod-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.mod-v {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-strong);
+}
+
+.mod-l {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.mod > app-icon:last-child {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 18px;
+}
+
+.mod:hover > app-icon:last-child {
+  color: var(--mc);
+}
+
+/* ---- responsive ---- */
+@media (max-width: 1080px) {
+  .charts-1,
+  .charts-2 {
+    grid-template-columns: 1fr;
+  }
+}
