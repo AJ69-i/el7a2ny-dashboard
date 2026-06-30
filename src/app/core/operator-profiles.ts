@@ -15,7 +15,7 @@ export const OPERATOR_PROFILES: Record<string, OperatorProfile> = {
   'ahmedasemelfert@gmail.com': {
     name: 'Ahmed Asem Elfert',
     role: 'Owner',
-    avatar: '/operator-ahmed.jpg',
+    avatar: 'operator-ahmed.jpg',
   },
   'ahmed@el7a2ny.com': { name: 'Ahmed', role: 'Manager' },
   'manager@el7a2ny.com': { name: 'Manager', role: 'Manager' },

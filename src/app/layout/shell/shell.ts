@@ -97,7 +97,7 @@ export class ShellComponent {
   protected readonly mobileOpen = signal(false);
   protected readonly dark = signal(false);
   protected readonly searchOpen = signal(false);
-  protected readonly logoSrc = signal('/logo.webp');
+  protected readonly logoSrc = signal('logo.webp');
   protected readonly avatarBroken = signal(false);
   protected readonly initials = initials;
 

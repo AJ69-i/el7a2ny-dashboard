@@ -182,7 +182,7 @@ export class LoginComponent {
   protected readonly show = signal(false);
   protected readonly busy = signal(false);
   protected readonly error = signal<string | null>(null);
-  protected readonly logoSrc = signal('/logo.webp');
+  protected readonly logoSrc = signal('logo.webp');
 
   protected onLogoError(): void {
     const hosted = 'https://aj69-i.github.io/El7a2ny/assets/img/logo.webp';

@@ -80,8 +80,9 @@ export class NotificationService {
   private browserNotify(label: string, count: number): void {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
     const body = count > 1 ? `${count} new ${label} requests` : `New ${label} request`;
+    const icon = new URL('logo.webp', document.baseURI).href; // base-relative (works under /REPO/)
     try {
-      new Notification('El7a2ny', { body, icon: '/logo.webp', badge: '/logo.webp' });
+      new Notification('El7a2ny', { body, icon, badge: icon });
     } catch {
       /* notifications unsupported / blocked — ignore */
     }
